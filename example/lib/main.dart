@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:apk_manager/apk_manager.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,25 +17,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  PackageInfo? _platformVersion;
+  String? selectedFile;
+  ApkInstallResult? installResult;
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
+  Future<void> selectFile() async {
+    final res = await FilePicker.platform.pickFiles();
+    if (res?.files case [final file]) {
+      setState(() {
+        selectedFile = file.path;
+      });
+    }
   }
 
-  Future<void> initPlatformState() async {
-    PackageInfo? platformVersion;
-    try {
-      platformVersion = await ApkManager.getAppInfo("com.wearetoni.apk_manager_example");
-    } on PlatformException {
-      platformVersion = null;
+  Future<void> requestPermission(Permission permission) async {
+    if ((await permission.status).isDenied) {
+      await permission.request();
     }
-    if (!mounted) return;
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+  }
+
+  Future<void> installApp() async {
+    if (selectedFile case final path?) {
+      final res = await ApkManager.installApk(path: path);
+      setState(() {
+        installResult = res;
+      });
+    }
   }
 
   @override
@@ -45,11 +52,53 @@ class _MyAppState extends State<MyApp> {
           title: const Text('APK Manager Example App'),
         ),
         body: Center(
-          child: Text(
-            switch (_platformVersion) {
-              null => "Version not found",
-              final version => "Version:\n${version.packageName}\n${version.versionName}\n(${version.installTime})",
-            },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              spacing: 8,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        switch (selectedFile) {
+                          null => "No file selcted",
+                          final file => file,
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.file_open),
+                      onPressed: selectFile,
+                    ),
+                  ],
+                ),
+                if (selectedFile != null) ...[
+                  MaterialButton(
+                    onPressed: installApp,
+                    child: Text("Install APK"),
+                  ),
+                ],
+                if (installResult case final result?) ...[
+                  Text("Install Status: ${result.status}"),
+                  Text("Package Name: ${result.packageName}"),
+                ],
+                Spacer(),
+                Text("Request Permissions:"),
+                Wrap(
+                  children: [
+                    MaterialButton(
+                      onPressed: () => requestPermission(Permission.storage),
+                      child: Text("Storage Permission"),
+                    ),
+                    MaterialButton(
+                      onPressed: () => requestPermission(Permission.requestInstallPackages),
+                      child: Text("Install Permission"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

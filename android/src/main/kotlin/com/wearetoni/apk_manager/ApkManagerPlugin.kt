@@ -1,7 +1,9 @@
 package com.wearetoni.apk_manager
 
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
+import com.wearetoni.apk_manager.impl.ApkInstaller
 import com.wearetoni.apk_manager.impl.ApkUninstaller
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -10,10 +12,12 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 /** ApkManagerPlugin */
 class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
   private var activity: Activity? = null
+  private lateinit var context: Context;
 
   // --- Setup ---
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    context = flutterPluginBinding.applicationContext
     AndroidApkManagerApi.setUp(flutterPluginBinding.binaryMessenger, this)
   }
 
@@ -42,7 +46,12 @@ class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
   // --- Implementations ---
 
   override fun installApk(path: String, callback: (Result<InstallResultMsg>) -> Unit) {
-    TODO("Not yet implemented")
+    val act = activity
+    if (act == null) {
+      callback(Result.failure(Exception("Activity is missing")))
+    } else {
+      ApkInstaller(context, act).installPackage(path, callback)
+    }
   }
 
   override fun uninstallApk(packageName: String, callback: (Result<Unit>) -> Unit) {
