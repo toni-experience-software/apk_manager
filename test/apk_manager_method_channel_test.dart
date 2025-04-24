@@ -1,27 +1,52 @@
-import 'package:flutter/services.dart';
+import 'package:apk_manager/src/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:apk_manager/apk_manager_method_channel.dart';
+import 'package:apk_manager/src/apk_manager_method_channel.dart';
+
+import 'test_api.g.dart';
+
+class _TestApi implements TestHostAndroidApkManagerApi {
+  @override
+  PackageInfoMsg? getAppInfo(String packageName) {
+    return null;
+  }
+
+  @override
+  String? getPackageNameFromApk(String path) {
+    // TODO: implement getPackageNameFromApk
+    throw UnimplementedError();
+  }
+
+  @override
+  InstallResultMsg installApk(String path) {
+    // TODO: implement installApk
+    throw UnimplementedError();
+  }
+
+  @override
+  bool launchApp(String packageName) {
+    // TODO: implement launchApp
+    throw UnimplementedError();
+  }
+
+  @override
+  void uninstallApk(String packageName) {
+    // TODO: implement uninstallApk
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   MethodChannelApkManager platform = MethodChannelApkManager();
-  const MethodChannel channel = MethodChannel('apk_manager');
+
+  late _TestApi api;
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-      channel,
-      (MethodCall methodCall) async {
-        return '42';
-      },
-    );
+    api = _TestApi();
+    TestHostAndroidApkManagerApi.setUp(api);
   });
 
-  tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, null);
-  });
-
-  test('getPlatformVersion', () async {
-    expect(await platform.getPlatformVersion(), '42');
+  test('getAppInfo', () async {
+    expect(await platform.getAppInfo("test"), isNull);
   });
 }

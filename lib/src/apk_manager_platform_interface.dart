@@ -1,3 +1,4 @@
+import 'package:apk_manager/models/models.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'apk_manager_method_channel.dart';
@@ -23,7 +24,15 @@ abstract class ApkManagerPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
+  // --- Methods ---
+
+  Future<ApkInstallResult> installApk(String path);
+
+  Future<void> uninstallApk(String packageName);
+
+  Future<String?> getPackageNameFromApk(String path);
+
+  Future<PackageInfo?> getAppInfo(String packageName);
+
+  Future<bool> launchApp(String packageName);
 }

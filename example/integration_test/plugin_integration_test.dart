@@ -7,14 +7,12 @@
 // https://flutter.dev/to/integration-testing
 
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-
-import 'package:apk_manager/apk_manager.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  /*
   testWidgets('getPlatformVersion test', (WidgetTester tester) async {
     final ApkManager plugin = ApkManager();
     final String? version = await plugin.getPlatformVersion();
@@ -22,4 +20,5 @@ void main() {
     // just assert that some non-empty string is returned.
     expect(version?.isNotEmpty, true);
   });
+  */
 }
