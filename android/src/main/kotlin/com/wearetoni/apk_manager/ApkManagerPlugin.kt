@@ -1,33 +1,83 @@
 package com.wearetoni.apk_manager
 
+import android.app.Activity
+import android.content.pm.PackageManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 /** ApkManagerPlugin */
-class ApkManagerPlugin: FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
+  private var activity: Activity? = null
+
+  // --- Setup ---
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "apk_manager")
-    channel.setMethodCallHandler(this)
-  }
-
-  override fun onMethodCall(call: MethodCall, result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else {
-      result.notImplemented()
-    }
+    AndroidApkManagerApi.setUp(flutterPluginBinding.binaryMessenger, this)
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
+    AndroidApkManagerApi.setUp(binding.binaryMessenger, null)
+  }
+
+  // --- Activity Setup ---
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    activity = binding.activity
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    activity = binding.activity
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    activity = null
+  }
+
+  override fun onDetachedFromActivity() {
+    activity = null
+  }
+
+  // --- Implementations ---
+
+  override fun installApk(path: String): InstallResultMsg {
+    TODO("Not yet implemented")
+  }
+
+  override fun uninstallApk(packageName: String) {
+    TODO("Not yet implemented")
+  }
+
+  override fun getPackageNameFromApk(path: String): String? {
+    return activity
+      ?.packageManager
+      ?.getPackageArchiveInfo(path, 0)
+      ?.packageName
+  }
+
+  override fun getAppInfo(packageName: String): PackageInfoMsg? {
+    val manager = activity?.packageManager ?: return null
+    return try {
+      val appInfo = manager.getPackageInfo(packageName, 0)
+      return PackageInfoMsg(
+        appInfo.packageName,
+        appInfo.versionName,
+        appInfo.firstInstallTime,
+      )
+    } catch (e: PackageManager.NameNotFoundException) {
+      null
+    }
+  }
+
+  override fun launchApp(packageName: String): Boolean {
+    val act = activity ?: return false
+    try {
+      val intent = act.packageManager.getLaunchIntentForPackage(packageName)
+      if (intent != null) {
+        act.startActivity(intent)
+        return true
+      }
+    } catch (_: Exception) {}
+    return false
   }
 }
