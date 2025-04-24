@@ -49,9 +49,9 @@ abstract class TestHostAndroidApkManagerApi {
   static TestDefaultBinaryMessengerBinding? get _testBinaryMessengerBinding => TestDefaultBinaryMessengerBinding.instance;
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  InstallResultMsg installApk(String path);
+  Future<InstallResultMsg> installApk(String path);
 
-  void uninstallApk(String packageName);
+  Future<void> uninstallApk(String packageName);
 
   String? getPackageNameFromApk(String path);
 
@@ -76,7 +76,7 @@ abstract class TestHostAndroidApkManagerApi {
           assert(arg_path != null,
               'Argument for dev.flutter.pigeon.apk_manager.AndroidApkManagerApi.installApk was null, expected non-null String.');
           try {
-            final InstallResultMsg output = api.installApk(arg_path!);
+            final InstallResultMsg output = await api.installApk(arg_path!);
             return <Object?>[output];
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -101,7 +101,7 @@ abstract class TestHostAndroidApkManagerApi {
           assert(arg_packageName != null,
               'Argument for dev.flutter.pigeon.apk_manager.AndroidApkManagerApi.uninstallApk was null, expected non-null String.');
           try {
-            api.uninstallApk(arg_packageName!);
+            await api.uninstallApk(arg_packageName!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

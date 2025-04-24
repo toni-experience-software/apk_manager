@@ -17,7 +17,7 @@ class _TestApi implements TestHostAndroidApkManagerApi {
   }
 
   @override
-  InstallResultMsg installApk(String path) {
+  Future<InstallResultMsg> installApk(String path) async {
     // TODO: implement installApk
     throw UnimplementedError();
   }
@@ -29,7 +29,7 @@ class _TestApi implements TestHostAndroidApkManagerApi {
   }
 
   @override
-  void uninstallApk(String packageName) {
+  Future<void> uninstallApk(String packageName) async {
     // TODO: implement uninstallApk
   }
 }

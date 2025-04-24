@@ -2,6 +2,7 @@ package com.wearetoni.apk_manager
 
 import android.app.Activity
 import android.content.pm.PackageManager
+import com.wearetoni.apk_manager.impl.ApkUninstaller
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -40,12 +41,17 @@ class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
 
   // --- Implementations ---
 
-  override fun installApk(path: String): InstallResultMsg {
+  override fun installApk(path: String, callback: (Result<InstallResultMsg>) -> Unit) {
     TODO("Not yet implemented")
   }
 
-  override fun uninstallApk(packageName: String) {
-    TODO("Not yet implemented")
+  override fun uninstallApk(packageName: String, callback: (Result<Unit>) -> Unit) {
+    val act = activity
+    if (act == null) {
+      callback(Result.failure(Exception("Activity is missing")))
+    } else {
+      ApkUninstaller(act).uninstallPackage(packageName, callback)
+    }
   }
 
   override fun getPackageNameFromApk(path: String): String? {

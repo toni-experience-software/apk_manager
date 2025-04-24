@@ -36,9 +36,15 @@ class PackageInfoMsg {
 
 @HostApi(dartHostTestHandler: 'TestHostAndroidApkManagerApi')
 abstract class AndroidApkManagerApi {
+  @async
   InstallResultMsg installApk(String path);
+
+  @async
   void uninstallApk(String packageName);
+
   String? getPackageNameFromApk(String path);
+
   PackageInfoMsg? getAppInfo(String packageName);
+
   bool launchApp(String packageName);
 }

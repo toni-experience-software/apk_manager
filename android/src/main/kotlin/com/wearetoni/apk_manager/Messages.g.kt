@@ -176,10 +176,11 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
   }
 }
 
+
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface AndroidApkManagerApi {
-  fun installApk(path: String): InstallResultMsg
-  fun uninstallApk(packageName: String)
+  fun installApk(path: String, callback: (Result<InstallResultMsg>) -> Unit)
+  fun uninstallApk(packageName: String, callback: (Result<Unit>) -> Unit)
   fun getPackageNameFromApk(path: String): String?
   fun getAppInfo(packageName: String): PackageInfoMsg?
   fun launchApp(packageName: String): Boolean
@@ -199,12 +200,15 @@ interface AndroidApkManagerApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val pathArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              listOf(api.installApk(pathArg))
-            } catch (exception: Throwable) {
-              MessagesPigeonUtils.wrapError(exception)
+            api.installApk(pathArg) { result: Result<InstallResultMsg> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
             }
-            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)
@@ -216,13 +220,14 @@ interface AndroidApkManagerApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val packageNameArg = args[0] as String
-            val wrapped: List<Any?> = try {
-              api.uninstallApk(packageNameArg)
-              listOf(null)
-            } catch (exception: Throwable) {
-              MessagesPigeonUtils.wrapError(exception)
+            api.uninstallApk(packageNameArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
             }
-            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)
