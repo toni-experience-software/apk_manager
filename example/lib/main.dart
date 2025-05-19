@@ -19,6 +19,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String? selectedFile;
   ApkInstallResult? installResult;
+  bool? installed;
+  String? packageName;
+  int? installTime;
 
   Future<void> selectFile() async {
     final res = await FilePicker.platform.pickFiles();
@@ -40,6 +43,45 @@ class _MyAppState extends State<MyApp> {
       final res = await ApkManager.installApk(path: path);
       setState(() {
         installResult = res;
+        packageName = res.packageName;
+      });
+      await getAppInfo();
+    }
+  }
+
+  Future<void> getApkPackageName() async {
+    if (selectedFile case final path?) {
+      final res = await ApkManager.getPackageNameFromApk(path);
+      if (res != null) {
+        setState(() => packageName = res);
+      }
+    }
+  }
+
+  Future<void> getAppInfo() async {
+    if (packageName case final pkg?) {
+      final res = await ApkManager.getAppInfo(pkg);
+      setState(() {
+        installTime = res?.installTime;
+        installed = res != null;
+      });
+    }
+  }
+
+  Future<void> launchApp() async {
+    if (packageName case final pkg?) {
+      final res = await ApkManager.launchApp(pkg);
+      setState(() => installed = res);
+    }
+  }
+
+  Future<void> uninstallApp() async {
+    if (packageName case final pkg?) {
+      await ApkManager.uninstallApp(pkg);
+      setState(() {
+        installed = false;
+        installTime = null;
+        installResult = null;
       });
     }
   }
@@ -48,9 +90,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('APK Manager Example App'),
-        ),
+        appBar: AppBar(title: const Text('APK Manager Example App')),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -60,12 +100,10 @@ class _MyAppState extends State<MyApp> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        switch (selectedFile) {
-                          null => "No file selcted",
-                          final file => file,
-                        },
-                      ),
+                      child: Text(switch (selectedFile) {
+                        null => "No file selcted",
+                        final file => file,
+                      }),
                     ),
                     IconButton(
                       icon: Icon(Icons.file_open),
@@ -79,11 +117,53 @@ class _MyAppState extends State<MyApp> {
                     child: Text("Install APK"),
                   ),
                 ],
-                if (installResult case final result?) ...[
-                  Text("Install Status: ${result.status}"),
-                  Text("Package Name: ${result.packageName}"),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (installResult case final result?) ...[
+                      Text("Install Status: ${result.status}"),
+                    ],
+                    if (packageName case final packageName?) ...[
+                      Text("Package Name: $packageName"),
+                    ],
+                    if (installed case final isInstalled?) ...[
+                      Text("Installed: $isInstalled"),
+                    ],
+                    if (installTime case final time?) ...[
+                      Text(
+                        "Install Time: ${DateTime.fromMillisecondsSinceEpoch(time)}",
+                      ),
+                    ],
+                  ],
+                ),
+                Divider(),
+                if (selectedFile != null) ...[
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      MaterialButton(
+                        onPressed: getApkPackageName,
+                        child: Text("Get Package Name"),
+                      ),
+                      MaterialButton(
+                        onPressed: getAppInfo,
+                        child: Text("Get App Info"),
+                      ),
+                      if (packageName != null && installed == true) ...[
+                        MaterialButton(
+                          onPressed: launchApp,
+                          child: Text("Launch App"),
+                        ),
+                        MaterialButton(
+                          onPressed: uninstallApp,
+                          child: Text("Uninstall App"),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
                 Spacer(),
+                Divider(),
                 Text("Request Permissions:"),
                 Wrap(
                   children: [
@@ -92,7 +172,10 @@ class _MyAppState extends State<MyApp> {
                       child: Text("Storage Permission"),
                     ),
                     MaterialButton(
-                      onPressed: () => requestPermission(Permission.requestInstallPackages),
+                      onPressed:
+                          () => requestPermission(
+                            Permission.requestInstallPackages,
+                          ),
                       child: Text("Install Permission"),
                     ),
                   ],
