@@ -2,9 +2,19 @@ name: apk_manager
 description: A Flutter plugin that allows you to manage and install apps on Android devices.
 version: 0.0.1
 homepage: https://wearetoni.com/
+repository: https://github.com/toni-experience-software/apk_manager
+issue_tracker: https://github.com/toni-experience-software/apk_manager/issues
+
+platforms:
+  android:
+
+topics:
+  - flutter
+  - android
+  - apk
 
 environment:
-  sdk: ^3.7.2
+  sdk: ">=3.0.0 <4.0.0"
   flutter: '>=3.3.0'
 
 dependencies:
