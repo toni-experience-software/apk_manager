@@ -61,7 +61,7 @@ await ApkManager.uninstallApp('com.example.app');
 To extract the package name from an APK file:
 
 ```dart
-final packageName = await ApkManager.getPackageNameFromApk('/path/to/file.apk');
+final packageName = ApkManager.getPackageNameFromApk('/path/to/file.apk');
 ```
 
 ### Getting app information
@@ -69,7 +69,7 @@ final packageName = await ApkManager.getPackageNameFromApk('/path/to/file.apk');
 You can retrieve information about an installed app using its package name:
 
 ```dart
-final info = await ApkManager.getAppInfo('com.example.app');
+final info = ApkManager.getAppInfo('com.example.app');
 if (info != null) {
   print('App version: ${info.versionName}');
 }
@@ -80,7 +80,7 @@ if (info != null) {
 To check if a specific package is currently installed:
 
 ```dart
-final isInstalled = await ApkManager.isAppInstalled('com.example.app');
+final isInstalled = ApkManager.isAppInstalled('com.example.app');
 ```
 
 ### Checking if an APK is installed
@@ -88,7 +88,7 @@ final isInstalled = await ApkManager.isAppInstalled('com.example.app');
 To check if an APK file corresponds to an installed app:
 
 ```dart
-final isInstalled = await ApkManager.isApkInstalled('/path/to/file.apk');
+final isInstalled = ApkManager.isApkInstalled('/path/to/file.apk');
 ```
 
 ### Launching an app
@@ -96,5 +96,5 @@ final isInstalled = await ApkManager.isApkInstalled('/path/to/file.apk');
 You can launch an installed app using its package name:
 
 ```dart
-final success = await ApkManager.launchApp('com.example.app');
+final success = ApkManager.launchApp('com.example.app');
 ```

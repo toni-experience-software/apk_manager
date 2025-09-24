@@ -3,75 +3,40 @@ package com.wearetoni.apk_manager
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.annotation.Keep
 import com.wearetoni.apk_manager.impl.ApkInstaller
 import com.wearetoni.apk_manager.impl.ApkUninstaller
-import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+
+@Keep
+data class InstallResultMsg (
+  val packageName: String? = null,
+  val status: Long
+)
+
+@Keep
+data class PackageInfoMsg (
+  val packageName: String,
+  val versionName: String? = null,
+  val installTime: Long
+)
 
 /** ApkManagerPlugin */
-class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
-  private var activity: Activity? = null
-  private lateinit var context: Context;
-
-  // --- Setup ---
-
-  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    AndroidApkManagerApi.setUp(flutterPluginBinding.binaryMessenger, this)
+@Keep
+class ApkManagerPlugin {
+  suspend fun installApk(activity: Activity, context: Context, path: String): InstallResultMsg? {
+    return ApkInstaller(context, activity).installPackage(path)
   }
 
-  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    AndroidApkManagerApi.setUp(binding.binaryMessenger, null)
+  suspend fun uninstallApk(activity: Activity, packageName: String): Boolean {
+    return ApkUninstaller(activity).uninstallPackage(packageName)
   }
 
-  // --- Activity Setup ---
-
-  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity
+  fun getPackageNameFromApk(activity: Activity, path: String): String? {
+    return activity.packageManager?.getPackageArchiveInfo(path, 0)?.packageName
   }
 
-  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    activity = binding.activity
-  }
-
-  override fun onDetachedFromActivityForConfigChanges() {
-    activity = null
-  }
-
-  override fun onDetachedFromActivity() {
-    activity = null
-  }
-
-  // --- Implementations ---
-
-  override fun installApk(path: String, callback: (Result<InstallResultMsg>) -> Unit) {
-    val act = activity
-    if (act == null) {
-      callback(Result.failure(Exception("Activity is missing")))
-    } else {
-      ApkInstaller(context, act).installPackage(path, callback)
-    }
-  }
-
-  override fun uninstallApk(packageName: String, callback: (Result<Unit>) -> Unit) {
-    val act = activity
-    if (act == null) {
-      callback(Result.failure(Exception("Activity is missing")))
-    } else {
-      ApkUninstaller(act).uninstallPackage(packageName, callback)
-    }
-  }
-
-  override fun getPackageNameFromApk(path: String): String? {
-    return activity
-      ?.packageManager
-      ?.getPackageArchiveInfo(path, 0)
-      ?.packageName
-  }
-
-  override fun getAppInfo(packageName: String): PackageInfoMsg? {
-    val manager = activity?.packageManager ?: return null
+  fun getAppInfo(activity: Activity, packageName: String): PackageInfoMsg? {
+    val manager = activity.packageManager ?: return null
     return try {
       val appInfo = manager.getPackageInfo(packageName, 0)
       return PackageInfoMsg(
@@ -84,12 +49,11 @@ class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
     }
   }
 
-  override fun launchApp(packageName: String): Boolean {
-    val act = activity ?: return false
+  fun launchApp(activity: Activity, packageName: String): Boolean {
     try {
-      val intent = act.packageManager.getLaunchIntentForPackage(packageName)
+      val intent = activity.packageManager.getLaunchIntentForPackage(packageName)
       if (intent != null) {
-        act.startActivity(intent)
+        activity.startActivity(intent)
         return true
       }
     } catch (_: Exception) {}

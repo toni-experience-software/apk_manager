@@ -1,4 +1,4 @@
-import 'package:apk_manager/src/messages.g.dart';
+import 'package:apk_manager/src/apk_manager_utils.dart';
 
 class PackageInfo {
   const PackageInfo({
@@ -11,10 +11,9 @@ class PackageInfo {
   final String? versionName;
   final int installTime;
 
-  static PackageInfo fromMessage(PackageInfoMsg msg) => 
-      PackageInfo(
-        packageName: msg.packageName,
-        versionName: msg.versionName,
-        installTime: msg.installTime,
+  static PackageInfo fromJavaObject(PackageInfoMsg msg) => PackageInfo(
+        packageName: msg.getPackageName().toDartString(),
+        versionName: msg.getVersionName()?.toDartString(),
+        installTime: msg.getInstallTime(),
       );
 }
