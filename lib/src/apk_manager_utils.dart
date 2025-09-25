@@ -284,6 +284,41 @@ class ApkManagerPlugin extends jni$_.JObject {
         .object<PackageInfoMsg?>(const $PackageInfoMsg$NullableType());
   }
 
+  static final _id_getAppIcon = _class.instanceMethodId(
+    r'getAppIcon',
+    r'(Landroid/app/Activity;Ljava/lang/String;)[B',
+  );
+
+  static final _getAppIcon = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                  jni$_.Pointer<jni$_.Void>,
+                  jni$_.JMethodIDPtr,
+                  jni$_.VarArgs<
+                      (
+                        jni$_.Pointer<jni$_.Void>,
+                        jni$_.Pointer<jni$_.Void>
+                      )>)>>('globalEnv_CallObjectMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>)>();
+
+  /// from: `public final byte[] getAppIcon(android.app.Activity activity, java.lang.String string)`
+  /// The returned object must be released after use, by calling the [release] method.
+  jni$_.JByteArray? getAppIcon(
+    jni$_.JObject activity,
+    jni$_.JString string,
+  ) {
+    final _$activity = activity.reference;
+    final _$string = string.reference;
+    return _getAppIcon(reference.pointer, _id_getAppIcon as jni$_.JMethodIDPtr,
+            _$activity.pointer, _$string.pointer)
+        .object<jni$_.JByteArray?>(const jni$_.JByteArrayNullableType());
+  }
+
   static final _id_launchApp = _class.instanceMethodId(
     r'launchApp',
     r'(Landroid/app/Activity;Ljava/lang/String;)Z',
@@ -780,7 +815,7 @@ class PackageInfoMsg extends jni$_.JObject {
   static const nullableType = $PackageInfoMsg$NullableType();
   static const type = $PackageInfoMsg$Type();
   static final _id_new$ = _class.constructorId(
-    r'(Ljava/lang/String;Ljava/lang/String;J)V',
+    r'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IJJ)V',
   );
 
   static final _new$ = jni$_.ProtectedJniExtensions.lookup<
@@ -792,6 +827,9 @@ class PackageInfoMsg extends jni$_.JObject {
                       (
                         jni$_.Pointer<jni$_.Void>,
                         jni$_.Pointer<jni$_.Void>,
+                        jni$_.Pointer<jni$_.Void>,
+                        jni$_.Int32,
+                        jni$_.Int64,
                         jni$_.Int64
                       )>)>>('globalEnv_NewObject')
       .asFunction<
@@ -800,75 +838,58 @@ class PackageInfoMsg extends jni$_.JObject {
               jni$_.JMethodIDPtr,
               jni$_.Pointer<jni$_.Void>,
               jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>,
+              int,
+              int,
               int)>();
 
-  /// from: `public void <init>(java.lang.String string, java.lang.String string1, long j)`
+  /// from: `public void <init>(java.lang.String string, java.lang.String string1, java.lang.String string2, int i, long j, long j1)`
   /// The returned object must be released after use, by calling the [release] method.
   factory PackageInfoMsg(
-    jni$_.JString string,
-    jni$_.JString? string1,
+    jni$_.JString? string,
+    jni$_.JString string1,
+    jni$_.JString? string2,
+    int i,
     int j,
+    int j1,
   ) {
-    final _$string = string.reference;
-    final _$string1 = string1?.reference ?? jni$_.jNullReference;
+    final _$string = string?.reference ?? jni$_.jNullReference;
+    final _$string1 = string1.reference;
+    final _$string2 = string2?.reference ?? jni$_.jNullReference;
     return PackageInfoMsg.fromReference(_new$(
             _class.reference.pointer,
             _id_new$ as jni$_.JMethodIDPtr,
             _$string.pointer,
             _$string1.pointer,
-            j)
+            _$string2.pointer,
+            i,
+            j,
+            j1)
         .reference);
   }
 
-  static final _id_new$1 = _class.constructorId(
-    r'(Ljava/lang/String;Ljava/lang/String;JILkotlin/jvm/internal/DefaultConstructorMarker;)V',
+  static final _id_getName = _class.instanceMethodId(
+    r'getName',
+    r'()Ljava/lang/String;',
   );
 
-  static final _new$1 = jni$_.ProtectedJniExtensions.lookup<
+  static final _getName = jni$_.ProtectedJniExtensions.lookup<
           jni$_.NativeFunction<
               jni$_.JniResult Function(
-                  jni$_.Pointer<jni$_.Void>,
-                  jni$_.JMethodIDPtr,
-                  jni$_.VarArgs<
-                      (
-                        jni$_.Pointer<jni$_.Void>,
-                        jni$_.Pointer<jni$_.Void>,
-                        jni$_.Int64,
-                        jni$_.Int32,
-                        jni$_.Pointer<jni$_.Void>
-                      )>)>>('globalEnv_NewObject')
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallObjectMethod')
       .asFunction<
           jni$_.JniResult Function(
-              jni$_.Pointer<jni$_.Void>,
-              jni$_.JMethodIDPtr,
-              jni$_.Pointer<jni$_.Void>,
-              jni$_.Pointer<jni$_.Void>,
-              int,
-              int,
-              jni$_.Pointer<jni$_.Void>)>();
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
 
-  /// from: `synthetic public void <init>(java.lang.String string, java.lang.String string1, long j, int i, kotlin.jvm.internal.DefaultConstructorMarker defaultConstructorMarker)`
+  /// from: `public final java.lang.String getName()`
   /// The returned object must be released after use, by calling the [release] method.
-  factory PackageInfoMsg.new$1(
-    jni$_.JString? string,
-    jni$_.JString? string1,
-    int j,
-    int i,
-    jni$_.JObject? defaultConstructorMarker,
-  ) {
-    final _$string = string?.reference ?? jni$_.jNullReference;
-    final _$string1 = string1?.reference ?? jni$_.jNullReference;
-    final _$defaultConstructorMarker =
-        defaultConstructorMarker?.reference ?? jni$_.jNullReference;
-    return PackageInfoMsg.fromReference(_new$1(
-            _class.reference.pointer,
-            _id_new$1 as jni$_.JMethodIDPtr,
-            _$string.pointer,
-            _$string1.pointer,
-            j,
-            i,
-            _$defaultConstructorMarker.pointer)
-        .reference);
+  jni$_.JString? getName() {
+    return _getName(reference.pointer, _id_getName as jni$_.JMethodIDPtr)
+        .object<jni$_.JString?>(const jni$_.JStringNullableType());
   }
 
   static final _id_getPackageName = _class.instanceMethodId(
@@ -921,6 +942,30 @@ class PackageInfoMsg extends jni$_.JObject {
         .object<jni$_.JString?>(const jni$_.JStringNullableType());
   }
 
+  static final _id_getVersionCode = _class.instanceMethodId(
+    r'getVersionCode',
+    r'()I',
+  );
+
+  static final _getVersionCode = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallIntMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
+
+  /// from: `public final int getVersionCode()`
+  int getVersionCode() {
+    return _getVersionCode(
+            reference.pointer, _id_getVersionCode as jni$_.JMethodIDPtr)
+        .integer;
+  }
+
   static final _id_getInstallTime = _class.instanceMethodId(
     r'getInstallTime',
     r'()J',
@@ -945,6 +990,30 @@ class PackageInfoMsg extends jni$_.JObject {
         .long;
   }
 
+  static final _id_getLastUpdateTime = _class.instanceMethodId(
+    r'getLastUpdateTime',
+    r'()J',
+  );
+
+  static final _getLastUpdateTime = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallLongMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
+
+  /// from: `public final long getLastUpdateTime()`
+  int getLastUpdateTime() {
+    return _getLastUpdateTime(
+            reference.pointer, _id_getLastUpdateTime as jni$_.JMethodIDPtr)
+        .long;
+  }
+
   static final _id_component1 = _class.instanceMethodId(
     r'component1',
     r'()Ljava/lang/String;',
@@ -964,9 +1033,9 @@ class PackageInfoMsg extends jni$_.JObject {
 
   /// from: `public final java.lang.String component1()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString component1() {
+  jni$_.JString? component1() {
     return _component1(reference.pointer, _id_component1 as jni$_.JMethodIDPtr)
-        .object<jni$_.JString>(const jni$_.JStringType());
+        .object<jni$_.JString?>(const jni$_.JStringNullableType());
   }
 
   static final _id_component2 = _class.instanceMethodId(
@@ -988,17 +1057,64 @@ class PackageInfoMsg extends jni$_.JObject {
 
   /// from: `public final java.lang.String component2()`
   /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? component2() {
+  jni$_.JString component2() {
     return _component2(reference.pointer, _id_component2 as jni$_.JMethodIDPtr)
-        .object<jni$_.JString?>(const jni$_.JStringNullableType());
+        .object<jni$_.JString>(const jni$_.JStringType());
   }
 
   static final _id_component3 = _class.instanceMethodId(
     r'component3',
-    r'()J',
+    r'()Ljava/lang/String;',
   );
 
   static final _component3 = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallObjectMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
+
+  /// from: `public final java.lang.String component3()`
+  /// The returned object must be released after use, by calling the [release] method.
+  jni$_.JString? component3() {
+    return _component3(reference.pointer, _id_component3 as jni$_.JMethodIDPtr)
+        .object<jni$_.JString?>(const jni$_.JStringNullableType());
+  }
+
+  static final _id_component4 = _class.instanceMethodId(
+    r'component4',
+    r'()I',
+  );
+
+  static final _component4 = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallIntMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
+
+  /// from: `public final int component4()`
+  int component4() {
+    return _component4(reference.pointer, _id_component4 as jni$_.JMethodIDPtr)
+        .integer;
+  }
+
+  static final _id_component5 = _class.instanceMethodId(
+    r'component5',
+    r'()J',
+  );
+
+  static final _component5 = jni$_.ProtectedJniExtensions.lookup<
           jni$_.NativeFunction<
               jni$_.JniResult Function(
                 jni$_.Pointer<jni$_.Void>,
@@ -1010,15 +1126,38 @@ class PackageInfoMsg extends jni$_.JObject {
             jni$_.JMethodIDPtr,
           )>();
 
-  /// from: `public final long component3()`
-  int component3() {
-    return _component3(reference.pointer, _id_component3 as jni$_.JMethodIDPtr)
+  /// from: `public final long component5()`
+  int component5() {
+    return _component5(reference.pointer, _id_component5 as jni$_.JMethodIDPtr)
+        .long;
+  }
+
+  static final _id_component6 = _class.instanceMethodId(
+    r'component6',
+    r'()J',
+  );
+
+  static final _component6 = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+              )>>('globalEnv_CallLongMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+            jni$_.Pointer<jni$_.Void>,
+            jni$_.JMethodIDPtr,
+          )>();
+
+  /// from: `public final long component6()`
+  int component6() {
+    return _component6(reference.pointer, _id_component6 as jni$_.JMethodIDPtr)
         .long;
   }
 
   static final _id_copy = _class.instanceMethodId(
     r'copy',
-    r'(Ljava/lang/String;Ljava/lang/String;J)Lcom/wearetoni/apk_manager/PackageInfoMsg;',
+    r'(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IJJ)Lcom/wearetoni/apk_manager/PackageInfoMsg;',
   );
 
   static final _copy = jni$_.ProtectedJniExtensions.lookup<
@@ -1030,6 +1169,9 @@ class PackageInfoMsg extends jni$_.JObject {
                       (
                         jni$_.Pointer<jni$_.Void>,
                         jni$_.Pointer<jni$_.Void>,
+                        jni$_.Pointer<jni$_.Void>,
+                        jni$_.Int32,
+                        jni$_.Int64,
                         jni$_.Int64
                       )>)>>('globalEnv_CallObjectMethod')
       .asFunction<
@@ -1038,19 +1180,26 @@ class PackageInfoMsg extends jni$_.JObject {
               jni$_.JMethodIDPtr,
               jni$_.Pointer<jni$_.Void>,
               jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>,
+              int,
+              int,
               int)>();
 
-  /// from: `public final com.wearetoni.apk_manager.PackageInfoMsg copy(java.lang.String string, java.lang.String string1, long j)`
+  /// from: `public final com.wearetoni.apk_manager.PackageInfoMsg copy(java.lang.String string, java.lang.String string1, java.lang.String string2, int i, long j, long j1)`
   /// The returned object must be released after use, by calling the [release] method.
   PackageInfoMsg copy(
-    jni$_.JString string,
-    jni$_.JString? string1,
+    jni$_.JString? string,
+    jni$_.JString string1,
+    jni$_.JString? string2,
+    int i,
     int j,
+    int j1,
   ) {
-    final _$string = string.reference;
-    final _$string1 = string1?.reference ?? jni$_.jNullReference;
+    final _$string = string?.reference ?? jni$_.jNullReference;
+    final _$string1 = string1.reference;
+    final _$string2 = string2?.reference ?? jni$_.jNullReference;
     return _copy(reference.pointer, _id_copy as jni$_.JMethodIDPtr,
-            _$string.pointer, _$string1.pointer, j)
+            _$string.pointer, _$string1.pointer, _$string2.pointer, i, j, j1)
         .object<PackageInfoMsg>(const $PackageInfoMsg$Type());
   }
 

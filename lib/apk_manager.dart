@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:apk_manager/models/models.dart';
 import 'package:apk_manager/src/apk_manager_interface.dart';
 
@@ -73,5 +75,14 @@ class ApkManager {
   /// Returns true if the app was launched successfully, false otherwise.
   static bool launchApp(String packageName) {
     return _manager.launchApp(packageName);
+  }
+
+  /// Gets the icon of an installed app.
+  ///
+  /// [packageName] - the package name of the app.
+  ///
+  /// Returns the app icon as [Uint8List] if the app is installed and has an icon, null otherwise.
+  static Uint8List? getIcon(String packageName) {
+    return _manager.getAppIcon(packageName);
   }
 }

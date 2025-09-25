@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _MyAppState extends State<MyApp> {
   bool? installed;
   String? packageName;
   int? installTime;
+  Uint8List? appIcon;
 
   Future<void> selectFile() async {
     final res = await FilePicker.platform.pickFiles();
@@ -45,32 +47,34 @@ class _MyAppState extends State<MyApp> {
         installResult = res;
         packageName = res.packageName;
       });
-      await getAppInfo();
+      getAppInfo();
     }
   }
 
-  Future<void> getApkPackageName() async {
+  void getApkPackageName() async {
     if (selectedFile case final path?) {
-      final res = await ApkManager.getPackageNameFromApk(path);
+      final res = ApkManager.getPackageNameFromApk(path);
       if (res != null) {
         setState(() => packageName = res);
       }
     }
   }
 
-  Future<void> getAppInfo() async {
+  void getAppInfo() {
     if (packageName case final pkg?) {
-      final res = await ApkManager.getAppInfo(pkg);
+      final res = ApkManager.getAppInfo(pkg);
+      final icon = ApkManager.getIcon(pkg);
       setState(() {
         installTime = res?.installTime;
         installed = res != null;
+        appIcon = icon;
       });
     }
   }
 
-  Future<void> launchApp() async {
+  void launchApp() {
     if (packageName case final pkg?) {
-      final res = await ApkManager.launchApp(pkg);
+      final res = ApkManager.launchApp(pkg);
       setState(() => installed = res);
     }
   }
@@ -82,6 +86,7 @@ class _MyAppState extends State<MyApp> {
         installed = false;
         installTime = null;
         installResult = null;
+        appIcon = null;
       });
     }
   }
@@ -117,23 +122,31 @@ class _MyAppState extends State<MyApp> {
                     child: Text("Install APK"),
                   ),
                 ],
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  spacing: 8,
                   children: [
-                    if (installResult case final result?) ...[
-                      Text("Install Status: ${result.status}"),
-                    ],
-                    if (packageName case final packageName?) ...[
-                      Text("Package Name: $packageName"),
-                    ],
-                    if (installed case final isInstalled?) ...[
-                      Text("Installed: $isInstalled"),
-                    ],
-                    if (installTime case final time?) ...[
-                      Text(
-                        "Install Time: ${DateTime.fromMillisecondsSinceEpoch(time)}",
+                    if (appIcon case final icon?) ...[Image.memory(icon)],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (installResult case final result?) ...[
+                            Text("Install Status: ${result.status}"),
+                          ],
+                          if (packageName case final packageName?) ...[
+                            Text("Package Name: $packageName"),
+                          ],
+                          if (installed case final isInstalled?) ...[
+                            Text("Installed: $isInstalled"),
+                          ],
+                          if (installTime case final time?) ...[
+                            Text(
+                              "Install Time: ${DateTime.fromMillisecondsSinceEpoch(time)}",
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
                 Divider(),

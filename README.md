@@ -9,6 +9,7 @@ Use this plugin in your Flutter Android App to:
 * Install APKs
 * Uninstall installed apps
 * Get app info from installed apps or APKs
+* Get app icons from installed apps
 * Launch installed apps
 
 ## Getting started
@@ -73,6 +74,14 @@ final info = ApkManager.getAppInfo('com.example.app');
 if (info != null) {
   print('App version: ${info.versionName}');
 }
+```
+
+### Getting app icon
+
+You can retrieve the icon of an installed app as raw bytes:
+
+```dart
+final iconBytes = ApkManager.getIcon('com.example.app');
 ```
 
 ### Checking if an app is installed
