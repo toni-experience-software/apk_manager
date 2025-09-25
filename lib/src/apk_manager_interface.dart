@@ -61,4 +61,15 @@ class ApkManagerInterface {
       final array => Uint8List.fromList(array.toList()),
     };
   }
+
+  Uint8List? getAppIconFromApk(String path) {
+    final array = ApkManagerPlugin().getAppIconFromApk(
+      activity,
+      path.toJString(),
+    );
+    return switch (array) {
+      null => null,
+      final array => Uint8List.fromList(array.toList()),
+    };
+  }
 }

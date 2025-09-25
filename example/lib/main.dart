@@ -55,7 +55,11 @@ class _MyAppState extends State<MyApp> {
     if (selectedFile case final path?) {
       final res = ApkManager.getPackageNameFromApk(path);
       if (res != null) {
-        setState(() => packageName = res);
+        final icon = ApkManager.getIconFromApk(path);
+        setState(() {
+          packageName = res;
+          appIcon = icon;
+        });
       }
     }
   }

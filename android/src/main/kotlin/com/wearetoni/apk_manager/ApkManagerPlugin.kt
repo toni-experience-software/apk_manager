@@ -2,6 +2,7 @@ package com.wearetoni.apk_manager
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.annotation.Keep
@@ -58,12 +59,27 @@ class ApkManagerPlugin {
     }
   }
 
-  fun getAppIcon(activity: Activity, packageName: String): ByteArray? {
-    val manager = activity.packageManager ?: return null
-    val bitmap = manager.getApplicationIcon(packageName).toBitmap()
+  private fun getAppIconFromInfo(manager: PackageManager, info: ApplicationInfo): ByteArray? {
+    val bitmap = manager.getApplicationIcon(info).toBitmap()
     val stream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
     return stream.toByteArray()
+  }
+
+  fun getAppIcon(activity: Activity, packageName: String): ByteArray? {
+    return try {
+      val manager = activity.packageManager ?: return null
+      val info = manager.getApplicationInfo(packageName, 0)
+      return getAppIconFromInfo(manager, info)
+    } catch (e: PackageManager.NameNotFoundException) {
+      null
+    }
+  }
+
+  fun getAppIconFromApk(activity: Activity, path: String): ByteArray? {
+    val manager = activity.packageManager ?: return null
+    val info = manager.getPackageArchiveInfo(path, 0)?.applicationInfo ?: return null
+    return getAppIconFromInfo(manager, info)
   }
 
   fun launchApp(activity: Activity, packageName: String): Boolean {

@@ -319,6 +319,44 @@ class ApkManagerPlugin extends jni$_.JObject {
         .object<jni$_.JByteArray?>(const jni$_.JByteArrayNullableType());
   }
 
+  static final _id_getAppIconFromApk = _class.instanceMethodId(
+    r'getAppIconFromApk',
+    r'(Landroid/app/Activity;Ljava/lang/String;)[B',
+  );
+
+  static final _getAppIconFromApk = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                  jni$_.Pointer<jni$_.Void>,
+                  jni$_.JMethodIDPtr,
+                  jni$_.VarArgs<
+                      (
+                        jni$_.Pointer<jni$_.Void>,
+                        jni$_.Pointer<jni$_.Void>
+                      )>)>>('globalEnv_CallObjectMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>)>();
+
+  /// from: `public final byte[] getAppIconFromApk(android.app.Activity activity, java.lang.String string)`
+  /// The returned object must be released after use, by calling the [release] method.
+  jni$_.JByteArray? getAppIconFromApk(
+    jni$_.JObject activity,
+    jni$_.JString string,
+  ) {
+    final _$activity = activity.reference;
+    final _$string = string.reference;
+    return _getAppIconFromApk(
+            reference.pointer,
+            _id_getAppIconFromApk as jni$_.JMethodIDPtr,
+            _$activity.pointer,
+            _$string.pointer)
+        .object<jni$_.JByteArray?>(const jni$_.JByteArrayNullableType());
+  }
+
   static final _id_launchApp = _class.instanceMethodId(
     r'launchApp',
     r'(Landroid/app/Activity;Ljava/lang/String;)Z',

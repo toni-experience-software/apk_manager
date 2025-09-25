@@ -85,4 +85,13 @@ class ApkManager {
   static Uint8List? getIcon(String packageName) {
     return _manager.getAppIcon(packageName);
   }
+
+  /// Gets the icon from an APK file.
+  ///
+  /// [path] - the path to the apk file.
+  ///
+  /// Returns the app icon as [Uint8List] if the APK file has an icon, null otherwise.
+  static Uint8List? getIconFromApk(String path) {
+    return _manager.getAppIconFromApk(path);
+  }
 }
