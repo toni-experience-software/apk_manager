@@ -1,3 +1,10 @@
+## 0.1.0
+
+* Use `jni` and `jnigen` instead of method channels
+    * Due to this more methods are now synchronous
+* Add more properties to `PackageInfo`
+* Add `getAppIcon` method
+
 ## 0.0.1
 
 * Add install APK method
