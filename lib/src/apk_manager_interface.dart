@@ -19,10 +19,14 @@ class ApkManagerInterface {
     }
   }
 
-  String? getPackageNameFromApk(String path) {
-    return ApkManagerPlugin()
-        .getPackageNameFromApk(activity, path.toJString())
-        ?.toDartString();
+  PackageInfo? getAppInfoFromApk(String path) {
+    final res =
+        ApkManagerPlugin().getAppInfoFromApk(activity, path.toJString());
+    if (res == null) {
+      return null;
+    } else {
+      return PackageInfo.fromJavaObject(res);
+    }
   }
 
   Future<ApkInstallResult> installApk(String path) async {

@@ -29,13 +29,13 @@ class ApkManager {
     return _manager.uninstallApk(packageName);
   }
 
-  /// Returns the package name of the apk file.
+  /// Fetches some [PackageInfo] from an apk file.
   ///
   /// [path] - the path to the apk file.
   ///
-  /// Returns the package name of the apk file.
-  static String? getPackageNameFromApk(String path) {
-    return _manager.getPackageNameFromApk(path);
+  /// Returns the [PackageInfo] of the apk file, null if not found.
+  static PackageInfo? getAppInfoFromApk(String path) {
+    return _manager.getAppInfoFromApk(path);
   }
 
   /// Fetches some [PackageInfo] about an installed app.
@@ -62,9 +62,9 @@ class ApkManager {
   ///
   /// Returns true if the apk file is installed, false otherwise.
   static bool isApkInstalled(String apkFilePath) {
-    return switch (getPackageNameFromApk(apkFilePath)) {
+    return switch (getAppInfoFromApk(apkFilePath)) {
       null => false,
-      final name => isAppInstalled(name),
+      final info => isAppInstalled(info.packageName),
     };
   }
 

@@ -211,44 +211,6 @@ class ApkManagerPlugin extends jni$_.JObject {
     );
   }
 
-  static final _id_getPackageNameFromApk = _class.instanceMethodId(
-    r'getPackageNameFromApk',
-    r'(Landroid/app/Activity;Ljava/lang/String;)Ljava/lang/String;',
-  );
-
-  static final _getPackageNameFromApk = jni$_.ProtectedJniExtensions.lookup<
-          jni$_.NativeFunction<
-              jni$_.JniResult Function(
-                  jni$_.Pointer<jni$_.Void>,
-                  jni$_.JMethodIDPtr,
-                  jni$_.VarArgs<
-                      (
-                        jni$_.Pointer<jni$_.Void>,
-                        jni$_.Pointer<jni$_.Void>
-                      )>)>>('globalEnv_CallObjectMethod')
-      .asFunction<
-          jni$_.JniResult Function(
-              jni$_.Pointer<jni$_.Void>,
-              jni$_.JMethodIDPtr,
-              jni$_.Pointer<jni$_.Void>,
-              jni$_.Pointer<jni$_.Void>)>();
-
-  /// from: `public final java.lang.String getPackageNameFromApk(android.app.Activity activity, java.lang.String string)`
-  /// The returned object must be released after use, by calling the [release] method.
-  jni$_.JString? getPackageNameFromApk(
-    jni$_.JObject activity,
-    jni$_.JString string,
-  ) {
-    final _$activity = activity.reference;
-    final _$string = string.reference;
-    return _getPackageNameFromApk(
-            reference.pointer,
-            _id_getPackageNameFromApk as jni$_.JMethodIDPtr,
-            _$activity.pointer,
-            _$string.pointer)
-        .object<jni$_.JString?>(const jni$_.JStringNullableType());
-  }
-
   static final _id_getAppInfo = _class.instanceMethodId(
     r'getAppInfo',
     r'(Landroid/app/Activity;Ljava/lang/String;)Lcom/wearetoni/apk_manager/PackageInfoMsg;',
@@ -281,6 +243,44 @@ class ApkManagerPlugin extends jni$_.JObject {
     final _$string = string.reference;
     return _getAppInfo(reference.pointer, _id_getAppInfo as jni$_.JMethodIDPtr,
             _$activity.pointer, _$string.pointer)
+        .object<PackageInfoMsg?>(const $PackageInfoMsg$NullableType());
+  }
+
+  static final _id_getAppInfoFromApk = _class.instanceMethodId(
+    r'getAppInfoFromApk',
+    r'(Landroid/app/Activity;Ljava/lang/String;)Lcom/wearetoni/apk_manager/PackageInfoMsg;',
+  );
+
+  static final _getAppInfoFromApk = jni$_.ProtectedJniExtensions.lookup<
+          jni$_.NativeFunction<
+              jni$_.JniResult Function(
+                  jni$_.Pointer<jni$_.Void>,
+                  jni$_.JMethodIDPtr,
+                  jni$_.VarArgs<
+                      (
+                        jni$_.Pointer<jni$_.Void>,
+                        jni$_.Pointer<jni$_.Void>
+                      )>)>>('globalEnv_CallObjectMethod')
+      .asFunction<
+          jni$_.JniResult Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.Pointer<jni$_.Void>)>();
+
+  /// from: `public final com.wearetoni.apk_manager.PackageInfoMsg getAppInfoFromApk(android.app.Activity activity, java.lang.String string)`
+  /// The returned object must be released after use, by calling the [release] method.
+  PackageInfoMsg? getAppInfoFromApk(
+    jni$_.JObject activity,
+    jni$_.JString string,
+  ) {
+    final _$activity = activity.reference;
+    final _$string = string.reference;
+    return _getAppInfoFromApk(
+            reference.pointer,
+            _id_getAppInfoFromApk as jni$_.JMethodIDPtr,
+            _$activity.pointer,
+            _$string.pointer)
         .object<PackageInfoMsg?>(const $PackageInfoMsg$NullableType());
   }
 
@@ -1050,6 +1050,32 @@ class PackageInfoMsg extends jni$_.JObject {
     return _getLastUpdateTime(
             reference.pointer, _id_getLastUpdateTime as jni$_.JMethodIDPtr)
         .long;
+  }
+
+  static final _id_new$1 = _class.constructorId(
+    r'(Landroid/content/pm/PackageInfo;)V',
+  );
+
+  static final _new$1 = jni$_.ProtectedJniExtensions.lookup<
+              jni$_.NativeFunction<
+                  jni$_.JniResult Function(
+                      jni$_.Pointer<jni$_.Void>,
+                      jni$_.JMethodIDPtr,
+                      jni$_.VarArgs<(jni$_.Pointer<jni$_.Void>,)>)>>(
+          'globalEnv_NewObject')
+      .asFunction<
+          jni$_.JniResult Function(jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr, jni$_.Pointer<jni$_.Void>)>();
+
+  /// from: `public void <init>(android.content.pm.PackageInfo packageInfo)`
+  /// The returned object must be released after use, by calling the [release] method.
+  factory PackageInfoMsg.new$1(
+    jni$_.JObject packageInfo,
+  ) {
+    final _$packageInfo = packageInfo.reference;
+    return PackageInfoMsg.fromReference(_new$1(_class.reference.pointer,
+            _id_new$1 as jni$_.JMethodIDPtr, _$packageInfo.pointer)
+        .reference);
   }
 
   static final _id_component1 = _class.instanceMethodId(

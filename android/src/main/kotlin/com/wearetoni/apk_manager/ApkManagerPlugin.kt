@@ -3,6 +3,7 @@ package com.wearetoni.apk_manager
 import android.app.Activity
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.annotation.Keep
@@ -25,7 +26,16 @@ data class PackageInfoMsg (
   val versionCode: Int,
   val installTime: Long,
   val lastUpdateTime: Long,
-)
+) {
+  constructor(info: PackageInfo): this(
+    info.applicationInfo?.name,
+    info.packageName,
+    info.versionName,
+    info.versionCode,
+    info.firstInstallTime,
+    info.lastUpdateTime,
+  )
+}
 
 /** ApkManagerPlugin */
 @Keep
@@ -38,25 +48,19 @@ class ApkManagerPlugin {
     return ApkUninstaller(activity).uninstallPackage(packageName)
   }
 
-  fun getPackageNameFromApk(activity: Activity, path: String): String? {
-    return activity.packageManager?.getPackageArchiveInfo(path, 0)?.packageName
-  }
-
   fun getAppInfo(activity: Activity, packageName: String): PackageInfoMsg? {
     val manager = activity.packageManager ?: return null
     return try {
-      val appInfo = manager.getPackageInfo(packageName, 0)
-      return PackageInfoMsg(
-        appInfo.applicationInfo?.name,
-        appInfo.packageName,
-        appInfo.versionName,
-        appInfo.versionCode,
-        appInfo.firstInstallTime,
-        appInfo.lastUpdateTime,
-      )
+      val info = manager.getPackageInfo(packageName, 0)
+      return PackageInfoMsg(info)
     } catch (e: PackageManager.NameNotFoundException) {
       null
     }
+  }
+
+  fun getAppInfoFromApk(activity: Activity, path: String): PackageInfoMsg? {
+    val info = activity.packageManager?.getPackageArchiveInfo(path, 0) ?: return null
+    return PackageInfoMsg(info)
   }
 
   private fun getAppIconFromInfo(manager: PackageManager, info: ApplicationInfo): ByteArray? {

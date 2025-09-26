@@ -57,20 +57,23 @@ await ApkManager.uninstallApp('com.example.app');
 
 > Due to limitations of the uninstall api it's currently not possible to detect when the user cancels the uninstall in the system dialog.
 
-### Getting the package name from an APK
-
-To extract the package name from an APK file:
-
-```dart
-final packageName = ApkManager.getPackageNameFromApk('/path/to/file.apk');
-```
-
 ### Getting app information
 
 You can retrieve information about an installed app using its package name:
 
 ```dart
 final info = ApkManager.getAppInfo('com.example.app');
+if (info != null) {
+  print('App version: ${info.versionName}');
+}
+```
+
+### Getting app information from an APK
+
+You can retrieve information about an APK file:
+
+```dart
+final info = ApkManager.getAppInfoFromApk('/path/to/file.apk');
 if (info != null) {
   print('App version: ${info.versionName}');
 }

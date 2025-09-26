@@ -53,11 +53,11 @@ class _MyAppState extends State<MyApp> {
 
   void getApkPackageName() async {
     if (selectedFile case final path?) {
-      final res = ApkManager.getPackageNameFromApk(path);
+      final res = ApkManager.getAppInfoFromApk(path);
       if (res != null) {
         final icon = ApkManager.getIconFromApk(path);
         setState(() {
-          packageName = res;
+          packageName = res.packageName;
           appIcon = icon;
         });
       }
