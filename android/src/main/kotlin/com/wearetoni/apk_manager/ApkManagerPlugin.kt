@@ -63,6 +63,12 @@ class ApkManagerPlugin {
     return PackageInfoMsg(info)
   }
 
+  fun getInstalledApps(activity: Activity): List<PackageInfoMsg>? {
+    val manager = activity.packageManager ?: return null
+    val apps = manager.getInstalledPackages(0)
+    return apps.map { info -> PackageInfoMsg(info) }
+  }
+
   private fun getAppIconFromInfo(manager: PackageManager, info: ApplicationInfo): ByteArray? {
     val bitmap = manager.getApplicationIcon(info).toBitmap()
     val stream = ByteArrayOutputStream()
@@ -88,7 +94,8 @@ class ApkManagerPlugin {
 
   fun launchApp(activity: Activity, packageName: String): Boolean {
     try {
-      val intent = activity.packageManager.getLaunchIntentForPackage(packageName)
+      val manager = activity.packageManager ?: return false
+      val intent = manager.getLaunchIntentForPackage(packageName)
       if (intent != null) {
         activity.startActivity(intent)
         return true

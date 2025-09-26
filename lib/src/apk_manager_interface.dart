@@ -29,6 +29,11 @@ class ApkManagerInterface {
     }
   }
 
+  List<PackageInfo>? getInstalledApps() {
+    final list = ApkManagerPlugin().getInstalledApps(activity);
+    return list?.map((e) => PackageInfo.fromJavaObject(e)).toList();
+  }
+
   Future<ApkInstallResult> installApk(String path) async {
     final res = await ApkManagerPlugin().installApk(
       activity,

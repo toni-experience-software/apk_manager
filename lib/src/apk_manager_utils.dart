@@ -284,6 +284,35 @@ class ApkManagerPlugin extends jni$_.JObject {
         .object<PackageInfoMsg?>(const $PackageInfoMsg$NullableType());
   }
 
+  static final _id_getInstalledApps = _class.instanceMethodId(
+    r'getInstalledApps',
+    r'(Landroid/app/Activity;)Ljava/util/List;',
+  );
+
+  static final _getInstalledApps = jni$_.ProtectedJniExtensions.lookup<
+              jni$_.NativeFunction<
+                  jni$_.JniResult Function(
+                      jni$_.Pointer<jni$_.Void>,
+                      jni$_.JMethodIDPtr,
+                      jni$_.VarArgs<(jni$_.Pointer<jni$_.Void>,)>)>>(
+          'globalEnv_CallObjectMethod')
+      .asFunction<
+          jni$_.JniResult Function(jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr, jni$_.Pointer<jni$_.Void>)>();
+
+  /// from: `public final java.util.List<com.wearetoni.apk_manager.PackageInfoMsg> getInstalledApps(android.app.Activity activity)`
+  /// The returned object must be released after use, by calling the [release] method.
+  jni$_.JList<PackageInfoMsg>? getInstalledApps(
+    jni$_.JObject activity,
+  ) {
+    final _$activity = activity.reference;
+    return _getInstalledApps(reference.pointer,
+            _id_getInstalledApps as jni$_.JMethodIDPtr, _$activity.pointer)
+        .object<jni$_.JList<PackageInfoMsg>?>(
+            const jni$_.JListNullableType<PackageInfoMsg>(
+                $PackageInfoMsg$Type()));
+  }
+
   static final _id_getAppIcon = _class.instanceMethodId(
     r'getAppIcon',
     r'(Landroid/app/Activity;Ljava/lang/String;)[B',

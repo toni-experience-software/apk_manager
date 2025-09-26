@@ -94,4 +94,12 @@ class ApkManager {
   static Uint8List? getIconFromApk(String path) {
     return _manager.getAppIconFromApk(path);
   }
+
+  /// Gets a list of all installed apps on the device.
+  ///
+  /// Returns a list of [PackageInfo] objects representing all installed apps,
+  /// or null if unable to retrieve the app list.
+  static List<PackageInfo>? getInstalledApps() {
+    return _manager.getInstalledApps();
+  }
 }

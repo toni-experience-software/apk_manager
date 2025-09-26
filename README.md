@@ -118,3 +118,16 @@ You can launch an installed app using its package name:
 ```dart
 final success = ApkManager.launchApp('com.example.app');
 ```
+
+### Getting all installed apps
+
+You can retrieve a list of all installed apps on the device:
+
+```dart
+final installedApps = ApkManager.getInstalledApps();
+if (installedApps != null) {
+  for (final app in installedApps) {
+    print('${app.appName} (${app.packageName}) - Version: ${app.versionName}');
+  }
+}
+```
