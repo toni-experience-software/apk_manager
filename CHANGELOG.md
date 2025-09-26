@@ -2,7 +2,7 @@
 
 * Use `jni` and `jnigen` instead of method channels
     * Due to this more methods are now synchronous
-* Add more properties to `PackageInfo`
+* Add more properties to `PackageInfo` and use `DateTime` when applicable
 * Add `getIcon` and `getIconFromApk` method
 
 ## 0.0.1

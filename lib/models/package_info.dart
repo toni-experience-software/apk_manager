@@ -14,15 +14,16 @@ class PackageInfo {
   final String packageName;
   final String? versionName;
   final int versionCode;
-  final int installTime;
-  final int lastUpdateTime;
+  final DateTime installTime;
+  final DateTime lastUpdateTime;
 
   static PackageInfo fromJavaObject(PackageInfoMsg info) => PackageInfo(
         name: info.getName()?.toDartString(),
         packageName: info.getPackageName().toDartString(),
         versionName: info.getVersionName()?.toDartString(),
-        installTime: info.getInstallTime(),
         versionCode: info.getVersionCode(),
-        lastUpdateTime: info.getLastUpdateTime(),
+        installTime: DateTime.fromMillisecondsSinceEpoch(info.getInstallTime()),
+        lastUpdateTime:
+            DateTime.fromMillisecondsSinceEpoch(info.getLastUpdateTime()),
       );
 }

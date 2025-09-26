@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   ApkInstallResult? installResult;
   bool? installed;
   String? packageName;
-  int? installTime;
+  DateTime? installTime;
   Uint8List? appIcon;
 
   Future<void> selectFile() async {
@@ -144,9 +144,7 @@ class _MyAppState extends State<MyApp> {
                             Text("Installed: $isInstalled"),
                           ],
                           if (installTime case final time?) ...[
-                            Text(
-                              "Install Time: ${DateTime.fromMillisecondsSinceEpoch(time)}",
-                            ),
+                            Text("Install Time: $time"),
                           ],
                         ],
                       ),
