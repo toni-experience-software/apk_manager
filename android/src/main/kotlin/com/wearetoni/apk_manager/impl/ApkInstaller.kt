@@ -13,67 +13,77 @@ import androidx.core.content.ContextCompat
 import com.wearetoni.apk_manager.InstallResultMsg
 import java.io.FileInputStream
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 internal class ApkInstaller(private val context: Context, private val activity: Activity) {
-    fun installPackage(path: String, result: (Result<InstallResultMsg>) -> Unit) {
-        var session: PackageInstaller.Session? = null
-        val receiverAction = "PACKAGE_INSTALLED_ACTION.${System.currentTimeMillis()}" // Unique action per install
-    
-        // Register receiver before commit
-        val packageChangeReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val extras = intent.extras
-                if (extras != null) {
-                    when (val status = extras.getInt(PackageInstaller.EXTRA_STATUS)) {
-                        PackageInstaller.STATUS_PENDING_USER_ACTION -> {
-                            var confirmIntent = (extras.get(Intent.EXTRA_INTENT) as Intent)
-                            confirmIntent =
-                                confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                            activity.startActivity(confirmIntent)
+    suspend fun installPackage(path: String): InstallResultMsg? {
+
+
+        var res = suspendCoroutine {
+            cont ->
+            var session: PackageInstaller.Session? = null
+            val receiverAction = "PACKAGE_INSTALLED_ACTION.${System.currentTimeMillis()}" // Unique action per install
+
+            // Register receiver before commit
+            val packageChangeReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val extras = intent.extras
+                    if (extras != null) {
+                        when (val status = extras.getInt(PackageInstaller.EXTRA_STATUS)) {
+                            PackageInstaller.STATUS_PENDING_USER_ACTION -> {
+                                var confirmIntent = (extras.get(Intent.EXTRA_INTENT) as Intent)
+                                confirmIntent =
+                                    confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                activity.startActivity(confirmIntent)
+                            }
+                            else -> {
+                                val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
+                                cont.resume(InstallResultMsg(packageName, status.toLong()))
+                                context.applicationContext.unregisterReceiver(this)
+                            }
                         }
-                         else -> {
-                             val packageName = intent.getStringExtra(PackageInstaller.EXTRA_PACKAGE_NAME)
-                             val res = InstallResultMsg(packageName, status.toLong())
-                             result(Result.success(res))
-                             context.applicationContext.unregisterReceiver(this)
-                         }
                     }
                 }
             }
-        }
-        val filter = IntentFilter(receiverAction)
-        ContextCompat.registerReceiver(
-            context.applicationContext,
-            packageChangeReceiver,
-            filter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-    
-        try {
-            val packageManager = activity.packageManager
-            val packageInstaller = packageManager.packageInstaller
-    
-            session = createSession(packageInstaller)
-            loadAPKFile(path, session)
-    
-            // Explicit intent for PendingIntent (required for FLAG_MUTABLE on Android 14+)
-            val intent = Intent(receiverAction).setPackage(context.packageName)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val filter = IntentFilter(receiverAction)
+            ContextCompat.registerReceiver(
+                context.applicationContext,
+                packageChangeReceiver,
+                filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
             )
-            val statusReceiver = pendingIntent.intentSender
-            session.commit(statusReceiver)
-            session.close()
-        } catch (e: IOException) {
-            session?.abandon()
-            result(Result.failure(RuntimeException("IO exception", e)))
-        } catch (e: Exception) {
-            session?.abandon()
-            result(Result.failure(e))
+
+            try {
+                val packageManager = activity.packageManager
+                val packageInstaller = packageManager.packageInstaller
+
+                session = createSession(packageInstaller)
+                loadAPKFile(path, session)
+
+                // Explicit intent for PendingIntent (required for FLAG_MUTABLE on Android 14+)
+                val intent = Intent(receiverAction).setPackage(context.packageName)
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+                val statusReceiver = pendingIntent.intentSender
+                session.commit(statusReceiver)
+                session.close()
+            } catch (e: IOException) {
+                session?.abandon()
+                context.applicationContext.unregisterReceiver(packageChangeReceiver)
+                cont.resumeWithException(RuntimeException("IO exception", e))
+            } catch (e: Exception) {
+                session?.abandon()
+                context.applicationContext.unregisterReceiver(packageChangeReceiver)
+                cont.resumeWithException(RuntimeException("Exception", e))
+            }
         }
+        return res
     }
 
     private fun createSession(packageInstaller: PackageInstaller): PackageInstaller.Session {

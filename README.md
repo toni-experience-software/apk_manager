@@ -9,6 +9,7 @@ Use this plugin in your Flutter Android App to:
 * Install APKs
 * Uninstall installed apps
 * Get app info from installed apps or APKs
+* Get app icons from installed apps or APKs
 * Launch installed apps
 
 ## Getting started
@@ -56,23 +57,42 @@ await ApkManager.uninstallApp('com.example.app');
 
 > Due to limitations of the uninstall api it's currently not possible to detect when the user cancels the uninstall in the system dialog.
 
-### Getting the package name from an APK
-
-To extract the package name from an APK file:
-
-```dart
-final packageName = await ApkManager.getPackageNameFromApk('/path/to/file.apk');
-```
-
 ### Getting app information
 
 You can retrieve information about an installed app using its package name:
 
 ```dart
-final info = await ApkManager.getAppInfo('com.example.app');
+final info = ApkManager.getAppInfo('com.example.app');
 if (info != null) {
   print('App version: ${info.versionName}');
 }
+```
+
+### Getting app information from an APK
+
+You can retrieve information about an APK file:
+
+```dart
+final info = ApkManager.getAppInfoFromApk('/path/to/file.apk');
+if (info != null) {
+  print('App version: ${info.versionName}');
+}
+```
+
+### Getting app icon
+
+You can retrieve the icon of an installed app as raw bytes:
+
+```dart
+final iconBytes = ApkManager.getIcon('com.example.app');
+```
+
+### Getting icon from APK file
+
+You can retrieve the icon from an APK file without installing it:
+
+```dart
+final iconBytes = ApkManager.getIconFromApk('/path/to/file.apk');
 ```
 
 ### Checking if an app is installed
@@ -80,7 +100,7 @@ if (info != null) {
 To check if a specific package is currently installed:
 
 ```dart
-final isInstalled = await ApkManager.isAppInstalled('com.example.app');
+final isInstalled = ApkManager.isAppInstalled('com.example.app');
 ```
 
 ### Checking if an APK is installed
@@ -88,7 +108,7 @@ final isInstalled = await ApkManager.isAppInstalled('com.example.app');
 To check if an APK file corresponds to an installed app:
 
 ```dart
-final isInstalled = await ApkManager.isApkInstalled('/path/to/file.apk');
+final isInstalled = ApkManager.isApkInstalled('/path/to/file.apk');
 ```
 
 ### Launching an app
@@ -96,5 +116,18 @@ final isInstalled = await ApkManager.isApkInstalled('/path/to/file.apk');
 You can launch an installed app using its package name:
 
 ```dart
-final success = await ApkManager.launchApp('com.example.app');
+final success = ApkManager.launchApp('com.example.app');
+```
+
+### Getting all installed apps
+
+You can retrieve a list of all installed apps on the device:
+
+```dart
+final installedApps = ApkManager.getInstalledApps();
+if (installedApps != null) {
+  for (final app in installedApps) {
+    print('${app.appName} (${app.packageName}) - Version: ${app.versionName}');
+  }
+}
 ```

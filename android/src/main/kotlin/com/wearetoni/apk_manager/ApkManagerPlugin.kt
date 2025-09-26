@@ -2,94 +2,102 @@ package com.wearetoni.apk_manager
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.annotation.Keep
+import androidx.core.graphics.drawable.toBitmap
 import com.wearetoni.apk_manager.impl.ApkInstaller
 import com.wearetoni.apk_manager.impl.ApkUninstaller
-import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import java.io.ByteArrayOutputStream
+
+@Keep
+data class InstallResultMsg (
+  val packageName: String? = null,
+  val status: Long
+)
+
+@Keep
+data class PackageInfoMsg (
+  val name: String?,
+  val packageName: String,
+  val versionName: String?,
+  val versionCode: Int,
+  val installTime: Long,
+  val lastUpdateTime: Long,
+) {
+  constructor(info: PackageInfo): this(
+    info.applicationInfo?.name,
+    info.packageName,
+    info.versionName,
+    info.versionCode,
+    info.firstInstallTime,
+    info.lastUpdateTime,
+  )
+}
 
 /** ApkManagerPlugin */
-class ApkManagerPlugin : FlutterPlugin, ActivityAware, AndroidApkManagerApi {
-  private var activity: Activity? = null
-  private lateinit var context: Context;
-
-  // --- Setup ---
-
-  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    AndroidApkManagerApi.setUp(flutterPluginBinding.binaryMessenger, this)
+@Keep
+class ApkManagerPlugin {
+  suspend fun installApk(activity: Activity, context: Context, path: String): InstallResultMsg? {
+    return ApkInstaller(context, activity).installPackage(path)
   }
 
-  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    AndroidApkManagerApi.setUp(binding.binaryMessenger, null)
+  suspend fun uninstallApk(activity: Activity, packageName: String): Boolean {
+    return ApkUninstaller(activity).uninstallPackage(packageName)
   }
 
-  // --- Activity Setup ---
-
-  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity
-  }
-
-  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-    activity = binding.activity
-  }
-
-  override fun onDetachedFromActivityForConfigChanges() {
-    activity = null
-  }
-
-  override fun onDetachedFromActivity() {
-    activity = null
-  }
-
-  // --- Implementations ---
-
-  override fun installApk(path: String, callback: (Result<InstallResultMsg>) -> Unit) {
-    val act = activity
-    if (act == null) {
-      callback(Result.failure(Exception("Activity is missing")))
-    } else {
-      ApkInstaller(context, act).installPackage(path, callback)
-    }
-  }
-
-  override fun uninstallApk(packageName: String, callback: (Result<Unit>) -> Unit) {
-    val act = activity
-    if (act == null) {
-      callback(Result.failure(Exception("Activity is missing")))
-    } else {
-      ApkUninstaller(act).uninstallPackage(packageName, callback)
-    }
-  }
-
-  override fun getPackageNameFromApk(path: String): String? {
-    return activity
-      ?.packageManager
-      ?.getPackageArchiveInfo(path, 0)
-      ?.packageName
-  }
-
-  override fun getAppInfo(packageName: String): PackageInfoMsg? {
-    val manager = activity?.packageManager ?: return null
+  fun getAppInfo(activity: Activity, packageName: String): PackageInfoMsg? {
+    val manager = activity.packageManager ?: return null
     return try {
-      val appInfo = manager.getPackageInfo(packageName, 0)
-      return PackageInfoMsg(
-        appInfo.packageName,
-        appInfo.versionName,
-        appInfo.firstInstallTime,
-      )
+      val info = manager.getPackageInfo(packageName, 0)
+      return PackageInfoMsg(info)
     } catch (e: PackageManager.NameNotFoundException) {
       null
     }
   }
 
-  override fun launchApp(packageName: String): Boolean {
-    val act = activity ?: return false
+  fun getAppInfoFromApk(activity: Activity, path: String): PackageInfoMsg? {
+    val info = activity.packageManager?.getPackageArchiveInfo(path, 0) ?: return null
+    return PackageInfoMsg(info)
+  }
+
+  fun getInstalledApps(activity: Activity): List<PackageInfoMsg>? {
+    val manager = activity.packageManager ?: return null
+    val apps = manager.getInstalledPackages(0)
+    return apps.map { info -> PackageInfoMsg(info) }
+  }
+
+  private fun getAppIconFromInfo(manager: PackageManager, info: ApplicationInfo): ByteArray? {
+    val bitmap = manager.getApplicationIcon(info).toBitmap()
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    return stream.toByteArray()
+  }
+
+  fun getAppIcon(activity: Activity, packageName: String): ByteArray? {
+    return try {
+      val manager = activity.packageManager ?: return null
+      val info = manager.getApplicationInfo(packageName, 0)
+      return getAppIconFromInfo(manager, info)
+    } catch (e: PackageManager.NameNotFoundException) {
+      null
+    }
+  }
+
+  fun getAppIconFromApk(activity: Activity, path: String): ByteArray? {
+    val manager = activity.packageManager ?: return null
+    val info = manager.getPackageArchiveInfo(path, 0)?.applicationInfo ?: return null
+    return getAppIconFromInfo(manager, info)
+  }
+
+  fun launchApp(activity: Activity, packageName: String): Boolean {
     try {
-      val intent = act.packageManager.getLaunchIntentForPackage(packageName)
+      val manager = activity.packageManager ?: return false
+      val intent = manager.getLaunchIntentForPackage(packageName)
       if (intent != null) {
-        act.startActivity(intent)
+        activity.startActivity(intent)
         return true
       }
     } catch (_: Exception) {}
